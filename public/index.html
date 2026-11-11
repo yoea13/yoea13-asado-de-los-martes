@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Asado de los Martes - División de Gastos</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-icon">🥩🔥</div>
+      <div class="header-text">
+        <h1>Asado de los Martes</h1>
+        <p>División equitativa de gastos</p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Card: Formulario de carga / edición -->
+      <section class="card form-card" id="form-section">
+        <h2 id="form-title">
+          <span class="icon">➕</span> Agregar Compra
+        </h2>
+        <form id="expense-form" autocomplete="off">
+          <input type="hidden" id="edit-id" value="">
+          
+          <div class="form-group">
+            <label for="person-name">¿Quién compró?</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input 
+                type="text" 
+                id="person-name" 
+                name="name" 
+                placeholder="Ej. Germán, Mario..." 
+                list="names-datalist"
+                required
+              >
+              <datalist id="names-datalist"></datalist>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="expense-detail">Detalle de la compra</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📝</span>
+              <input 
+                type="text" 
+                id="expense-detail" 
+                name="detail" 
+                placeholder="Ej. Carne para 10, Pan y carbón..." 
+                required
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="expense-amount">Valor ($)</label>
+            <div class="input-wrapper">
+              <span class="input-icon">💵</span>
+              <input 
+                type="number" 
+                id="expense-amount" 
+                name="amount" 
+                inputmode="decimal" 
+                placeholder="Ej. 50000" 
+                min="1" 
+                step="any"
+                required
+              >
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btn-submit-expense">
+              <span class="btn-icon">➕</span> <span id="btn-submit-text">Agregar Gasto</span>
+            </button>
+            <button type="button" class="btn btn-secondary hidden" id="btn-cancel-edit">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Card: Lista de Gastos Cargados -->
+      <section class="card expenses-card">
+        <div class="card-header-flex">
+          <h2>
+            <span class="icon">🛒</span> Gastos Realizados
+            <span class="badge" id="expenses-count">0</span>
+          </h2>
+          <div class="quick-total" id="quick-total-container">
+            Total: <span id="quick-total-amount">$0</span>
+          </div>
+        </div>
+
+        <!-- Lista -->
+        <div id="expenses-list" class="expenses-list">
+          <!-- Dinámico -->
+        </div>
+
+        <!-- Estado vacío -->
+        <div id="empty-state" class="empty-state">
+          <div class="empty-emoji">🥩</div>
+          <p class="empty-title">No hay compras cargadas todavía</p>
+          <p class="empty-sub">Cargá arriba lo que fue comprando cada uno para el asado.</p>
+        </div>
+
+        <!-- Botón Principal "Pagar" -->
+        <div class="pay-action-container">
+          <button type="button" class="btn btn-pay" id="btn-pay" disabled>
+            <span class="btn-pay-icon">🥩💵</span>
+            <span class="btn-pay-text">PAGAR / CALCULAR</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Card: Resultados y División -->
+      <section class="card results-card hidden" id="results-section">
+        <div class="results-header">
+          <h2>
+            <span class="icon">⚖️</span> Balance y División
+          </h2>
+          <button type="button" class="btn-link" id="btn-recalculate-attendees" title="Cambiar número de asistentes">
+            ✏️ Cambiar asistentes
+          </button>
+        </div>
+
+        <!-- Resumen Métricas -->
+        <div class="metrics-grid">
+          <div class="metric-box">
+            <span class="metric-label">Total Asado</span>
+            <span class="metric-value" id="metric-total-cost">$0</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Asistentes</span>
+            <span class="metric-value highlight" id="metric-attendees-count">0</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Por Persona</span>
+            <span class="metric-value" id="metric-per-person">$0</span>
+          </div>
+        </div>
+
+        <!-- Detalle de Balances -->
+        <div class="balances-container">
+          <h3>Quién debe poner y quién recibe</h3>
+          <div id="balances-list" class="balances-list">
+            <!-- Dinámico -->
+          </div>
+        </div>
+
+        <!-- Compartir por WhatsApp y Copiar -->
+        <div class="share-actions">
+          <button type="button" class="btn btn-whatsapp" id="btn-whatsapp">
+            <svg class="wa-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.41a8.173 8.173 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.06-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.167 8.167 0 0 1-1.25-4.46c0-4.54 3.69-8.24 8.24-8.24zm4.51 11.55c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.24-.75-.67-1.26-1.49-1.41-1.74-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44s-.56-1.36-.77-1.86c-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.44 1.03 2.61c.13.17 1.78 2.71 4.3 3.8.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.17-.48-.3z"/>
+            </svg>
+            Enviar por WhatsApp
+          </button>
+          <button type="button" class="btn btn-copy" id="btn-copy">
+            📋 Copiar Resumen
+          </button>
+        </div>
+
+        <div class="reset-container">
+          <button type="button" class="btn-link text-danger" id="btn-reset-all">
+            🗑️ Reiniciar todo el asado
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal: Preguntar Asistentes -->
+    <div class="modal-overlay hidden" id="attendees-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-icon">👥</div>
+          <h3>¿Cuántos comensales son?</h3>
+        </div>
+        <p class="modal-sub">
+          Indicá la cantidad total de asistentes al asado (incluye a quienes compraron y a los que no pusieron nada).
+        </p>
+
+        <div class="attendees-counter">
+          <button type="button" class="counter-btn" id="btn-minus-attendee" aria-label="Restar asistente">-</button>
+          <input 
+            type="number" 
+            id="attendees-input" 
+            value="1" 
+            min="1" 
+            step="1" 
+            inputmode="numeric"
+          >
+          <button type="button" class="counter-btn" id="btn-plus-attendee" aria-label="Sumar asistente">+</button>
+        </div>
+
+        <p class="modal-buyers-hint" id="modal-buyers-hint">
+          Hay <strong id="hint-buyers-count">0</strong> compradores registrados.
+        </p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary" id="btn-confirm-attendees">
+            Calcular División
+          </button>
+          <button type="button" class="btn btn-secondary" id="btn-close-modal">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast de Notificaciones -->
+    <div id="toast" class="toast hidden"></div>
+
+    <footer class="app-footer">
+      <p>🔥 <strong>Asado de los Martes</strong> &bull; Hecho por <a href="https://github.com/yoea13" target="_blank" rel="noopener">yoea13</a></p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
