@@ -74,3 +74,4 @@ Si **Germán** gastó `$50.000` en carne y **Mario** gastó `$10.000` en pan y c
   - **Germán**: Recibe **+$44.000** (puso $50.000)
   - **Mario**: Recibe **+$4.000** (puso $10.000)
   - **Los 8 asistentes restantes**: Deben poner **$6.000** cada uno
+

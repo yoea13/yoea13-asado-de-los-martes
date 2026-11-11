@@ -501,3 +501,4 @@ btnResetAll.addEventListener('click', () => {
 
 // Inicialización
 renderExpenses();
+
